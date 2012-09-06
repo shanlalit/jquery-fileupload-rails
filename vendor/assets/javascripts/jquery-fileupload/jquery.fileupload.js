@@ -1,5 +1,5 @@
 /*
- * jQuery File Upload Plugin 5.16.1
+ * jQuery File Upload Plugin 5.16.4
  * https://github.com/blueimp/jQuery-File-Upload
  *
  * Copyright 2010, Sebastian Tschan
@@ -850,7 +850,7 @@
                     fileInput.prop('entries'),
                 files,
                 value;
-            if (entries) {
+            if (entries && entries.length) {
                 return this._handleFileTreeEntries(entries);
             }
             files = $.makeArray(fileInput.prop('files'));
@@ -963,8 +963,8 @@
         _initSpecialOptions: function () {
             var options = this.options;
             if (options.fileInput === undefined) {
-                options.fileInput = this.element.is('input:file') ?
-                        this.element : this.element.find('input:file');
+                options.fileInput = this.element.is('input[type="file"]') ?
+                        this.element : this.element.find('input[type="file"]');
             } else if (!(options.fileInput instanceof $)) {
                 options.fileInput = $(options.fileInput);
             }
@@ -991,12 +991,20 @@
         },
 
         enable: function () {
+            var wasDisabled = false;
+            if (this.options.disabled) {
+                wasDisabled = true;
+            }
             $.Widget.prototype.enable.call(this);
-            this._initEventHandlers();
+            if (wasDisabled) {
+                this._initEventHandlers();
+            }
         },
 
         disable: function () {
-            this._destroyEventHandlers();
+            if (!this.options.disabled) {
+                this._destroyEventHandlers();
+            }
             $.Widget.prototype.disable.call(this);
         },
 
